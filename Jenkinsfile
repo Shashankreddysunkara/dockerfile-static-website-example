@@ -1,4 +1,4 @@
- def customImage = ""
+def customImage = ""
   node("linux") {
 
     stage("source") {
@@ -10,7 +10,7 @@
     stage("verify image") {
         try {
     sh '''
-        docker run -d -p 8000:8000/tcp --name helloworld dock101/helloinsta
+        docker run -d -p 8000:8000/tcp --name phonebook dock101/helloinsta
         sleep 20s
         curl_response=$(curl -s -o /dev/null -w "%{http_code}" 'http://localhost:8000')
         if [ $curl_response -eq 200 ]
@@ -22,7 +22,7 @@
     ''' 
     } catch (Exception e) {
     sh '''
-        docker stop helloworld
+        docker stop phonebook
     '''
     }  
     }
@@ -37,7 +37,7 @@
     stage("deploy to EKS") {
     sh '''              
         kubectl apply -f deployment.yml
-        kubectl set image deployment/my-hostname-app my-hostname-app=dock101/my-hostname-app:"${BUILD_NUMBER}" --record
+        kubectl set image deployment/phonebook phonebook=dock101/helloinsta:"${BUILD_NUMBER}" --record
         kubectl apply -f service.yml
         kubectl apply -f loadbalancer.yml
         sleep 20s
@@ -48,13 +48,13 @@
         try {
     sh '''
         export KUBECONFIG=/home/ubuntu/kubeconfig_ops-eks
-        kubectl autoscale deployment my-hostname-app --cpu-percent=70 --min=1 --max=4
+        kubectl autoscale deployment phonebook --cpu-percent=70 --min=1 --max=4
     '''
      } catch (Exception e) {
     sh '''
         export KUBECONFIG=/home/ubuntu/kubeconfig_ops-eks
         kubectl delete hpa phonebook
-        kubectl autoscale deployment my-hostname-app --cpu-percent=70 --min=1 --max=4
+        kubectl autoscale deployment phonebook --cpu-percent=70 --min=1 --max=4
     '''
         }
     }
