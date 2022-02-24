@@ -1,8 +1,9 @@
-FROM ubuntu
-MAINTAINER you@example.com
-RUN apt update
-RUN DEBIAN_FRONTEND=noninteractive apt install -y nginx git 
-EXPOSE 80
-RUN rm -Rf /var/www/html/*
-RUN git clone https://github.com/pmarcb/static-website-example.git /var/www/html/
-CMD ["nginx", "-g", "daemon off;"]
+FROM golang:alpine AS builder
+WORKDIR /go/src/hello
+RUN apk add --no-cache gcc libc-dev
+ADD app.go /go/src/hello/app.go
+RUN GOOS=linux GOARCH=amd64 go build -tags=netgo app.go
+
+FROM scratch
+COPY --from=builder /go/src/hello/app /app
+CMD ["/app"]
