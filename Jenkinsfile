@@ -23,13 +23,9 @@ def customImage = ""
     } catch (Exception e) {
     sh '''
         docker stop phonebook
-    '''
-    }  
-    }
-    stage("cleanup image") {
-    sh '''
         docker rm phonebook
     '''
+    }  
     }
     stage("push to DockerHub") {
         echo "Push to Dockerhub"
