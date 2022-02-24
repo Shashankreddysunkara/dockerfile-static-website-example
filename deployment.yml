@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: phonebook  
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: phonebook 
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: phonebook 
+      annotations:
+        prometheus.io/probe: 'true'
+        prometheus.io/scrape: 'true'
+    spec:
+      containers:
+      - name: phonebook 
+        image: "dock101/helloinsta"
+        resources:
+          requests:
+            cpu: 250m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 128Mi       
+        ports:
+        - containerPort: 8000
+        readinessProbe:
+          tcpSocket:
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 8000
+          initialDelaySeconds: 15
+          periodSeconds: 20     
+        imagePullPolicy: Always
