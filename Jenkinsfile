@@ -28,7 +28,7 @@ def customImage = ""
     }
     stage("cleanup image") {
     sh '''
-        docker stop phonebook
+        docker rm phonebook
     '''
     }
     stage("push to DockerHub") {
