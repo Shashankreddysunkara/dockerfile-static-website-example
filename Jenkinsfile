@@ -11,7 +11,7 @@ def customImage = ""
         try {
     sh '''
         docker run -d -p 8000:8000/tcp --name phonebook dock101/helloinsta
-        sleep 20s
+        sleep 65s
         curl_response=$(curl -s -o /dev/null -w "%{http_code}" 'http://localhost:8000')
         if [ $curl_response -eq 200 ]
         then
@@ -25,6 +25,11 @@ def customImage = ""
         docker stop phonebook
     '''
     }  
+    }
+    stage("cleanup image") {
+    sh '''
+        docker stop phonebook
+    '''
     }
     stage("push to DockerHub") {
         echo "Push to Dockerhub"
